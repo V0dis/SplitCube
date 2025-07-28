@@ -1,69 +1,76 @@
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Random = UnityEngine.Random;
 
 public class ObjectSplit : MonoBehaviour
 {
+    [Header("Setting")]
     [SerializeField] private GameObject _prefab;
-    [SerializeField] private float _explosionForceAfterSplit = 20f;
-    [SerializeField] private float _explosionForceAfterDestroy = 20f;
+    [SerializeField] private float _explosionForce = 20f;
     
-    private float _newSizeMultiplier = 0.5f;
-    private float _newСhanceMultiplier = 0.5f;
-    private float _chanceSplit = 1f;
+    [Header("Split setting")]
+    [SerializeField] private float _sizeMultiplier = 0.5f;
+    [SerializeField] private float _splitChanceMultiplier = 0.5f;
+    [SerializeField, Min(0)] private int _minClones = 2;
+    [SerializeField, Min(0)] private int _maxClones = 6;
+
+    private float _currentSplitChance = 1f;
 
     private void OnMouseDown()
     {
-        if (Random.value <= _chanceSplit)
+        if (Random.value <= _currentSplitChance)
         {
-            CreateClones();
-            Explode(_explosionForceAfterSplit, _prefab.transform.localScale.x / 2);
-        }
-        else
-        {
-            Explode(_explosionForceAfterDestroy, _prefab.transform.localScale.x * 10);
+            List<GameObject> clones = new List<GameObject>();
+            
+            CreateClones(clones);
+            Explode(clones);
         }
         
         Destroy(gameObject);
     }
 
-    private void CreateClones()
+    private void CreateClones(List<GameObject> clones)
     {
-        int minCount = 2;
-        int maxCount = 6;
-        int count = Random.Range(minCount, maxCount + 1);
+        if (_maxClones < _minClones)
+            _maxClones = _minClones;
+        
+        int count = Random.Range(_minClones, _maxClones + 1);
+        float spawnRadius = transform.localScale.x / 2;
 
         for (int i = 0; i < count; i++)
         {
-            CreateSingleClone();
+            Vector3 spawnPoint = transform.position + Random.insideUnitSphere * spawnRadius;
+            GameObject clone = Instantiate(_prefab, spawnPoint, Quaternion.identity);
+            
+            clones.Add(clone);
+            
+            InitializeClone(clone);
         }
     }
-    
-    private void CreateSingleClone()
+
+    private void InitializeClone(GameObject clone)
     {
-        var radiusSpawn = transform.localScale.x / 2;
+        clone.transform.localScale = transform.localScale * _sizeMultiplier;
         
-        Vector3 randomSpawnPoint = Random.insideUnitSphere * radiusSpawn + transform.position;
-        GameObject clone = Instantiate(_prefab, randomSpawnPoint, Quaternion.identity);
+        Renderer renderer = clone.GetComponent<Renderer>();
         
-        clone.transform.localScale *= _newSizeMultiplier;
-        clone.GetComponent<Renderer>().material.color = Random.ColorHSV();
-        clone.GetComponent<ObjectSplit>()._chanceSplit *= _newСhanceMultiplier;
-        clone.GetComponent<ObjectSplit>()._explosionForceAfterSplit *= _newSizeMultiplier;
+        if (renderer != null)
+            renderer.material.color = Random.ColorHSV();
+        
+        ObjectSplit splitScript = clone.GetComponent<ObjectSplit>();
+        splitScript._currentSplitChance = _currentSplitChance * _splitChanceMultiplier;
+        splitScript._explosionForce = _explosionForce * _sizeMultiplier;
     }
 
-    public void Explode(float explosionForce, float explosionRadius)
+    private void Explode(List<GameObject> clones)
     {
-        Collider[] hittedClones = Physics.OverlapSphere(transform.position, explosionRadius);
-
-        foreach (Collider hittedClone in hittedClones)
+        foreach (GameObject clone in clones)
         {
-            Rigidbody attachedNewClone = hittedClone.attachedRigidbody;
+            Rigidbody rigidbody = clone.GetComponent<Rigidbody>();
             
-            if (attachedNewClone != null)
+            if (rigidbody != null)
             {
-                Vector3 direction = hittedClone.transform.position - transform.position;
-                attachedNewClone.AddForce(direction.normalized * explosionForce, ForceMode.Impulse);
+                Vector3 direction = (clone.transform.position - transform.position).normalized;
+                rigidbody.AddForce(direction * _explosionForce, ForceMode.Impulse);
             }
         }
     }

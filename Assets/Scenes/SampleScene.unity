@@ -232,9 +232,9 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 35.4
   orthographic: 0
-  orthographic size: 5
+  orthographic size: 10.61
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -258,8 +258,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.1620911, y: 0.6915827, z: -0.16375387, w: 0.6845615}
-  m_LocalPosition: {x: -18.694687, y: 11.037081, z: 0.4188282}
+  m_LocalRotation: {x: 0.2784446, y: 0.6502953, z: -0.2787806, w: 0.64951223}
+  m_LocalPosition: {x: -27.581367, y: 28.815735, z: 0.18173897}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -649,9 +649,9 @@ GameObject:
   - component: {fileID: 933314403}
   - component: {fileID: 933314402}
   - component: {fileID: 933314401}
-  - component: {fileID: 933314399}
   - component: {fileID: 933314405}
   - component: {fileID: 933314404}
+  - component: {fileID: 933314406}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -659,21 +659,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &933314399
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 933314397}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e29048284f51d7146b33d58af5f6043b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _prefab: {fileID: 933314397}
-  _explosionForceAfterSplit: 20
-  _explosionForceAfterDestroy: 20
 --- !u!23 &933314401
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -790,6 +775,24 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!114 &933314406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 933314397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e29048284f51d7146b33d58af5f6043b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _prefab: {fileID: 933314397}
+  _explosionForce: 20
+  _sizeMultiplier: 0.5
+  _splitChanceMultiplier: 0.5
+  _minClones: 2
+  _maxClones: 6
 --- !u!1 &1000319391
 GameObject:
   m_ObjectHideFlags: 0
