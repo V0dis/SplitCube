@@ -11,12 +11,12 @@ public class CubeSplitHandler : MonoBehaviour
     
     private void OnEnable()
     {
-        _raycaster.IsRaycastCube += CheckSplitChance;
+        _raycaster.RaycastCube += CheckSplitChance;
     }
 
     private void OnDisable()
     {
-        _raycaster.IsRaycastCube -= CheckSplitChance;
+        _raycaster.RaycastCube -= CheckSplitChance;
     }
     
     public float ChanceMultiplier => _chanceMultiplier;

@@ -34,11 +34,9 @@ public class Spawner : MonoBehaviour
 
     private void SpawnSingleCube(Vector3 spawnPosition, Cube clickedCube)
     {
-        GameObject newObjectCube = Instantiate(clickedCube.gameObject, spawnPosition, Quaternion.identity);
+        Cube newCube = Instantiate(clickedCube, spawnPosition, Quaternion.identity);
         
-        Cube newCube = newObjectCube.GetComponent<Cube>();
-        
-        newObjectCube.transform.localScale *= _cubeSplitHandler.SizeMultiplier;
+        newCube.gameObject.transform.localScale *= _cubeSplitHandler.SizeMultiplier;
 
         float parentSplitChance = newCube.GetComponent<Cube>().SplitChance;
         float newSplitChance = parentSplitChance * _cubeSplitHandler.ChanceMultiplier;
