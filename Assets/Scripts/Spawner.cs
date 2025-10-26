@@ -1,72 +1,50 @@
-using UnityEngine;
-using System;
 using System.Collections.Generic;
-using Random = UnityEngine.Random;
+using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    [Header("Cube Settings")] 
-    [SerializeField] private SplitSetting _cubeSetting;
-    
-    [Header("Spawn Count")] 
-    [SerializeField] private int _minSpawn;
-    [SerializeField] private int _maxSpawn;
-    [SerializeField] private Raycaster _raycaster;
+    [SerializeField] private int _minCount = 2;
+    [SerializeField] private int _maxCount = 6;
+    [SerializeField] private CubeSplitHandler _cubeSplitHandler;
 
-    private GameObject _parentObject;
+    private List<Cube> _newCubes = new List<Cube>();
+
+    public List<Cube> GiveCubes()
+    {
+        List<Cube> newCubes = new List<Cube>(_newCubes);
         
-    public event Action<GameObject> IsSpawned;
-
-    private void OnEnable()
-    {
-        _raycaster.IsRaycastOnObject += CheckCance;
-    }
-
-    private void OnDisable()
-    {
-        _raycaster.IsRaycastOnObject -= CheckCance;
-    }
-
-    private void CheckCance(GameObject parentObject)
-    {
-        float chanceSplit = parentObject.GetComponent<ObjectValues>().SplitChance;
-
-        if (Random.value <= chanceSplit)
-        {
-            _parentObject = parentObject;
-            SpawnObjects();
-        }
+        _newCubes.Clear();
         
-        Destroy(parentObject);
+        return newCubes;
     }
     
-    private void SpawnObjects()
+    public void SpawnCubes(Cube clickedCube)
     {
-        int count = Random.Range(_minSpawn, _maxSpawn + 1);
-        float spawnRadius = _parentObject.transform.localScale.x / 2;
+        int count = Random.Range(_minCount, _maxCount + 1);
 
         for (int i = 0; i < count; i++)
         {
-            Vector3 spawnPoint = _parentObject.transform.localPosition + Random.insideUnitSphere * spawnRadius;
-        
-            var clone = Instantiate(_parentObject, spawnPoint, Quaternion.identity);
+            float spawnRadius = clickedCube.gameObject.transform.localScale.x / 2;
             
-            InitializeSingleObject(clone);
+            Vector3 spawnPoint = clickedCube.gameObject.transform.localPosition + Random.insideUnitSphere * spawnRadius;
+            
+            SpawnSingleCube(spawnPoint, clickedCube);
         }
-        IsSpawned?.Invoke(_parentObject);
     }
 
-    private void InitializeSingleObject(GameObject clone)
+    private void SpawnSingleCube(Vector3 spawnPosition, Cube clickedCube)
     {
-        clone.transform.localScale *= _cubeSetting.SizeMultipilier;
+        GameObject newObjectCube = Instantiate(clickedCube.gameObject, spawnPosition, Quaternion.identity);
         
-        Renderer renderer = clone.GetComponent<Renderer>();
+        Cube newCube = newObjectCube.GetComponent<Cube>();
         
-        if (renderer != null)
-            renderer.material.color = Random.ColorHSV();
+        newObjectCube.transform.localScale *= _cubeSplitHandler.SizeMultiplier;
 
-        float parentSplitChance = _parentObject.GetComponent<ObjectValues>().SplitChance;
-        float newSplitChance = parentSplitChance * _cubeSetting.ChanceMultiplier;
-        clone.GetComponent<ObjectValues>().SetNewChance(newSplitChance);
+        float parentSplitChance = newCube.GetComponent<Cube>().SplitChance;
+        float newSplitChance = parentSplitChance * _cubeSplitHandler.ChanceMultiplier;
+
+        newCube.Initialize(newSplitChance, Random.ColorHSV());
+
+        _newCubes.Add(newCube);
     }
 }

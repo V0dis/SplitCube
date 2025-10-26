@@ -1,14 +1,12 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class Raycaster : MonoBehaviour
 {
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private InputReader _inputReader;
     
-    public event Action<GameObject> IsRaycastOnObject; 
+    public event Action<Cube> IsRaycastCube; 
 
     private void OnEnable()
     {
@@ -26,7 +24,10 @@ public class Raycaster : MonoBehaviour
 
         if(Physics.Raycast(ray, out var hit))
         {
-            IsRaycastOnObject?.Invoke(hit.collider.gameObject);
+            if (hit.collider.TryGetComponent(out Cube cube))
+            {
+                IsRaycastCube?.Invoke(cube);
+            }
         }
     }
 }
